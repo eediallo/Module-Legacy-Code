@@ -17,10 +17,7 @@ import { createHeading } from "../components/heading.mjs";
 function hashtagView(hashtag) {
   destroy();
 
-  console.log(hashtag, "<~~~~~~`INCOMING HASHTAG");
-
   // Only fetch hashtag if we don't have it
-  console.log(state.currentHashtag, "<=====CURRENT HASHTAG");
   const normalized = hashtag.startsWith("#") ? hashtag : `#${hashtag}`;
   if (normalized !== state.currentHashtag) {
     apiService.getBloomsByHashtag(normalized);
