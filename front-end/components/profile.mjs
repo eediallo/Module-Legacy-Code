@@ -38,7 +38,7 @@ function createProfile(template, { profileData, whoToFollow, isLoggedIn }) {
   unfollowButtonEl.setAttribute("data-username", profileData.username || "");
 
   followButtonEl.hidden = profileData.is_self || profileData.is_following;
-  unfollowButtonEl.hidden = profileData.is_self || profileData.is_following;
+  unfollowButtonEl.hidden = profileData.is_self || !profileData.is_following;
 
   followButtonEl.addEventListener("click", handleFollow);
   unfollowButtonEl.addEventListener("click", handleUnfollow);
@@ -59,11 +59,16 @@ function createProfile(template, { profileData, whoToFollow, isLoggedIn }) {
       usernameLink.innerText = userToFollow.username;
       usernameLink.setAttribute("href", `/profile/${userToFollow.username}`);
 
-      const followButton = wtfElement.querySelector("button");
-      const unfollowButton = wtfElement.querySelector("button");
+      const followButton = wtfElement.querySelector("[data-action='follow']");
+      const unfollowButton = wtfElement.querySelector(
+        "[data-action='unfollow']"
+      );
 
       followButton.setAttribute("data-username", userToFollow.username);
       unfollowButton.setAttribute("data-username", userToFollow.username);
+
+      followButton.hidden = userToFollow.is_following;
+      unfollowButton.hidden = !userToFollow.is_following;
 
       followButton.addEventListener("click", handleFollow);
       unfollowButton.addEventListener("click", handleUnfollow);
@@ -88,6 +93,14 @@ async function handleFollow(event) {
   if (!username) return;
 
   await apiService.followUser(username);
+  // Hide follow button and show unfollow button
+  button.hidden = true;
+  const unfollowButton = button.parentElement.querySelector(
+    "[data-action='unfollow']"
+  );
+  if (unfollowButton) {
+    unfollowButton.hidden = false;
+  }
   await apiService.getWhoToFollow();
 }
 
@@ -97,6 +110,14 @@ async function handleUnfollow(event) {
   if (!username) return;
 
   await apiService.unfollowUser(username);
+  // Hide unfollow button and show follow button
+  button.hidden = true;
+  const followButton = button.parentElement.querySelector(
+    "[data-action='follow']"
+  );
+  if (followButton) {
+    followButton.hidden = false;
+  }
   await apiService.getWhoToFollow();
 }
 
