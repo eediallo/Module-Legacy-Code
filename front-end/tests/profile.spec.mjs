@@ -4,7 +4,7 @@ import {
   loginAsSample,
   loginAsJustSomeGuy,
   waitForLocatorToHaveMatches,
-  signUp
+  signUp,
 } from "./test-utils.mjs";
 
 test.describe("Profile View", () => {
@@ -56,28 +56,27 @@ test.describe("Profile View", () => {
   });
 
   test("allows unfollowing a user from their profile", async ({ page }) => {
-    await signUp(page, "sample");
-    await signUp(page, "AnotherUser");
-
-    // Given a profile component AnotherUser
+    // Given a profile component AS
     // And I am logged in as sample
     await loginAsSample(page);
-    await page.goto("/#/profile/AnotherUser");
-    // And sample is following AS
-    await page.click('[data-action="follow"]');
+    await page.goto("/#/profile/AS");
 
-    // When I view the profile component for AnotherUser
-    // Then I should see a button labeled "Unfollow"
-    const unfollowButton = page.locator('[data-action="unfollow"]');
+    // And sample is following AS, Then I should see the 'unfollow button'
+    const unfollowButton = page.locator(
+      '#profile-container .profile__actions [data-action="unfollow"][data-username="AS"]'
+    );
     await expect(unfollowButton).toBeVisible();
 
     // When I click the "Unfollow" button
     await unfollowButton.click();
 
-    // Then I should no longer be following AnotherUser
-    const followerCount = page.locator("[data-follower-count]");
-    await expect(followerCount).toHaveText("0");
-    // And the unfollow button is not visible
-    await expect(unfollowButton).toBe("hidden");
+    //Then I should no longer be following AS, and the 'Unfollow' button is not visible
+    await expect(unfollowButton).toBeHidden();
+
+    // And a "Follow" button should be visible
+    const followButton = page.locator(
+      '#profile-container .profile__actions [data-action="follow"][data-username="AS"]'
+    );
+    await expect(followButton).toBeVisible();
   });
 });
