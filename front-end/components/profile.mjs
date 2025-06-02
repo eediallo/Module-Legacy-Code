@@ -112,11 +112,11 @@ async function handleUnfollow(event) {
   await apiService.unfollowUser(username);
   // Hide unfollow button and show follow button
   button.hidden = true;
-  const followButton = button.parentElement.querySelector(
-    "[data-action='follow']"
+  const unfollowButton = button.parentElement.querySelector(
+    "[data-action='unfollow']"
   );
-  if (followButton) {
-    followButton.hidden = false;
+  if (unfollowButton) {
+    unfollowButton.hidden = false;
   }
   await apiService.getWhoToFollow();
 }
