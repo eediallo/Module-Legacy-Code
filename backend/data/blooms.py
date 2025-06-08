@@ -80,6 +80,39 @@ def get_blooms_for_user(
     return blooms
 
 
+
+def get_blooms_for_user_id(
+    user_id: int, *, before: Optional[int] = None, limit: Optional[int] = None
+) -> List[Bloom]:
+    with db_cursor() as cur:
+        kwargs = {
+            "user_id": user_id,
+        }
+        if before is not None:
+            before_clause = "AND send_timestamp < %(before_limit)s"
+            kwargs["before_limit"] = before
+        else:
+            before_clause = ""
+
+        limit_clause = make_limit_clause(limit, kwargs)
+
+        cur.execute(
+            f"""SELECT
+              blooms.id
+            FROM
+              blooms
+            WHERE
+              blooms.sender_id = %(user_id)s
+              {before_clause}
+            ORDER BY send_timestamp DESC
+            {limit_clause}
+            """,
+            kwargs,
+        )
+        rows = cur.fetchall()
+        return [row[0] for row in rows]
+
+
 def get_bloom(bloom_id: int) -> Optional[Bloom]:
     with db_cursor() as cur:
         cur.execute(
