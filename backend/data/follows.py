@@ -40,6 +40,28 @@ def get_followed_usernames(follower: User) -> List[str]:
         )
         rows = cur.fetchall()
         return [row[0] for row in rows]
+    
+
+def get_timeline(current_user: User) -> List[str]:
+    """get_followed_usernames returns a list of usernames followee follows."""
+    with db_cursor() as cur:
+        cur.execute(
+            """
+            SELECT 
+                users.username,
+                blooms.id
+            FROM
+                follows 
+            INNER JOIN
+                users ON follows.followee = users.id
+            JOIN
+                blooms ON blooms.sender_id = users.id
+            WHERE 
+                follower = %s""",
+            (current_user.id,),
+        )
+        rows = cur.fetchall()
+        return [row for row in rows]
 
 
 def get_inverse_followed_usernames(followee: User) -> List[str]:

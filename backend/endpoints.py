@@ -1,6 +1,7 @@
+import sys
 from typing import Dict, Union
 from data import blooms
-from data.follows import follow, unfollow, get_followed_usernames, get_inverse_followed_usernames
+from data.follows import follow, unfollow, get_followed_usernames,get_timeline, get_inverse_followed_usernames
 from data.users import (
     UserRegistrationError,
     get_suggested_follows,
@@ -206,11 +207,22 @@ def home_timeline():
 
     # Get blooms from followed users
     followed_users = get_followed_usernames(current_user)
+    followed_ids = get_timeline(current_user)
+    print(followed_ids, file=sys.stdout)
+    sys.stdout.flush()
+
+
     nested_user_blooms = [
         blooms.get_blooms_for_user(followed_user, limit=50)
         for followed_user in followed_users
     ]
 
+    # nested_user_blooms_ids = [
+    #     blooms.get_blooms_for_user_id(followed_user, limit=10)
+    #     for followed_user in followed_ids
+    # ]
+
+    # print(nested_user_blooms_ids, file=sys.stdout)
     # Flatten list of blooms from followed users
     followed_blooms = [bloom for blooms in nested_user_blooms for bloom in blooms]
 
